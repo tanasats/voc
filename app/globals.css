@@ -89,4 +89,6 @@ body {
 ::-ms-reveal {
   display: none;
 }
-
+.text-header-color {
+  color: rgb(0 50 110);
+}

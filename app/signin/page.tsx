@@ -29,7 +29,7 @@ import { useSession } from '@/app/context/SessionContext'
 //import toast from 'react-hot-toast'
 import { useToast } from "@/hooks/use-toast"
 import { EyeIcon, EyeOffIcon, Loader2 } from "lucide-react";
-import { findUsername } from '../_actions/user-action'
+import { addUser, findUsername } from '../_actions/user-action'
 
 export default function Login() {
   const [formError, setFormError] = useState<any[]>([]);
@@ -87,8 +87,8 @@ export default function Login() {
       // ถ้าไม่พบ ให้ทำการ Insert ลงในฐานข้อมูล role=<usertype>
       //const res =  findUsername(data.username)
       //console.log("result=",res);
-
-
+      const res1 = await addUser(data.username, data.fullname, data.mail,  data.usertype );
+      console.log("res1: ",res1)
       // ใช้ login function จาก SessionContext เพื่อ set ค่า session
       login({ id: data.username, name: data.fullname, role: data.usertype, email: data.mail }, data.access_token);
 

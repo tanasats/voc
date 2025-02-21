@@ -2,7 +2,7 @@ import React from 'react'
 
 function NotFoundPage() {
   return (
-    <div className='h-full flex items-center justify-center bg-slate-100 '>
+    <div className='h-96 flex justify-center text-2xl items-center'>
       404 | page not found
     </div>
   )

@@ -40,6 +40,13 @@ export async function middleware(request: NextRequest) { console.log("Hello Midd
       return NextResponse.redirect(new URL("/signin", request.url)); // กรณี Token ไม่ถูกต้อง
     }
     console.log("decodedToken = ", decoded);
+
+    
+
+
+
+
+
   }
   return NextResponse.next();
 }

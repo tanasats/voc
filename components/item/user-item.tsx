@@ -32,17 +32,13 @@ export default function UserItem(props: Props) {
         // </div>
 
 
-        <div className="flex py-4 px-4 items-center hover:bg-slate-100">
+        <div className="flex py-3 px-4 items-center hover:bg-slate-100">
             <div className="flex-1">
 
                 <div className='flex items-center'>
                     <div className='w-[85px]'>
-                        <Tooltip content="แก้ไข" position='top'>
-                            <span className={"inline-block text-green-600 me-3 cursor-pointer"} onClick={props.onEdit} ><LuPencil size={18} /></span>
-                        </Tooltip>
-                        <Tooltip content="ลบ" position="top">
-                            <span className={"inline-block text-red-600 cursor-pointer"} onClick={props.onDelete} ><LuTrash2 size={18} /></span>
-                        </Tooltip>
+                        <span className={"inline-block text-green-600 me-3 cursor-pointer"} onClick={props.onEdit} ><LuPencil size={18} /></span>
+                        <span className={"inline-block text-red-600 cursor-pointer"} onClick={props.onDelete} ><LuTrash2 size={18} /></span>
                     </div>
                     <div className='w-full flex'>
                         <div className="flex-1 hidden md:block">{props.user.username}</div>

@@ -5,6 +5,7 @@ import { FiMenu } from 'react-icons/fi'
 import { FiX } from 'react-icons/fi'
 import { useSession } from '@/app/context/SessionContext'
 import ConfirmModal from "@/components/ConfirmModal";
+import { LuLogIn, LuLogOut } from 'react-icons/lu'
 
 type NavItem = {
     label: string,
@@ -15,20 +16,20 @@ type NavItem = {
 
 const navItems: NavItem[] = [
     {
-        label: "หน้าหลัก",
+        label: "แผงควบคุม",
         link: "/dashboard",
         iconImage: ""
     },
-    {
-        label: "about",
-        link: "/about",
-        iconImage: ""
-    },
-    {
-        label: "test",
-        link: "/test",
-        iconImage: ""
-    },
+    // {
+    //     label: "about",
+    //     link: "/about",
+    //     iconImage: ""
+    // },
+    // {
+    //     label: "test",
+    //     link: "/test",
+    //     iconImage: ""
+    // },
     {
         label: "Profile",
         link: "/profile",
@@ -39,14 +40,20 @@ const navItems: NavItem[] = [
         link: "/admin/users",
         iconImage: ""
     },
+    {
+        label: "survey",
+        link: "/survey",
+        iconImage: ""
+    },
 ];
 
 export default function Navbar() {
+    const { user, logout } = useSession();
+
     const [isSideMenuOpen, SetSideMenuOpen] = useState(false);
     const colseSideMenu = () => {
         SetSideMenuOpen(false);
     }
-    const { user, logout } = useSession();
     const [isModalOpen, setIsModalOpen] = useState(false);
     
     useEffect(() => {
@@ -115,9 +122,9 @@ function MobileNav({ closeSideMenu }: { closeSideMenu: () => void }) {
                             </li>
                         ))}
                         {user ?
-                            <li className='p-2 w-full hover:bg-slate-300'><div className='text-center cursor-pointer' onClick={() => logout()}>SignOut</div></li>
+                            <li className='p-2 w-full hover:bg-slate-300'><div className='text-center cursor-pointer' onClick={() => logout()}><LuLogOut/></div></li>
                             :
-                            <li className='p-2 w-full hover:bg-slate-300'><Link className='text-center block' href={"/signin"}>SignIn</Link></li>
+                            <li className='p-2 w-full hover:bg-slate-300'><Link className='text-center block' href={"/signin"}><LuLogIn/></Link></li>
                         }
                     </ul>
                 </div>

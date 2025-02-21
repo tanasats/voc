@@ -1,23 +1,24 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableHead, TableHeader, TableRow, TableCell } from "@/components/ui/table";
 import DeleteConfirmModal from "@/components/DeleteConfirmModal";
-import UserDrawer from "@/components/drawer/UserDrawer";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import UserDrawer from "@/components/drawer/user-drawer";
 import { useToast } from "@/hooks/use-toast";
 import UserItem from "@/components/item/user-item";
 import { Input } from "@/components/ui/input";
+import cookie from 'js-cookie'
 
-import { 
-  LuSearch, 
+import {
+  LuSearch,
   LuRefreshCw,
-  LuPlus } from "react-icons/lu";
+  LuPlus
+} from "react-icons/lu";
 
 import Tooltip from '@/components/Tooltip';
-
+import { deleteUser, getUser, insertUser, updateUser } from "@/app/_actions/user-action";
 
 export default function UsersPage() {
+  const accesstoken = cookie.get('token'); //console.log("UsersPage() token=", accesstoken);
   const { toast } = useToast();
   const [users, setUsers] = useState([]);
   const [page, setPage] = useState(1);
@@ -28,21 +29,27 @@ export default function UsersPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
-
-
   useEffect(() => {
     fetchUsers();
   }, [page]); // ✅ เรียก fetchUsers() ใหม่ทุกครั้งที่ page เปลี่ยน
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch(`/api/users?page=${page}&limit=10`);
-      if (!res.ok) throw new Error("Failed to fetch users");
+      // const res = await fetch(`/api/users?page=${page}&limit=10`,{
+      //   method:"GET",
+      //   headers: { 
+      //     "Content-Type": "application/json",
+      //     Authorization: `Bearer ${accesstoken}`,
+      //    },
+      // });
+      // if (!res.ok) throw new Error("Failed to fetch users");
 
-      const data = await res.json();
-      setUsers(data.users);
-      setTotalPages(data.totalPages);
-      setTotalUsers(data.totalUsers);
+      // const data = await res.json();
+      const users: any = await getUser(page, 10,"");
+      console.log("users=", users)
+      setUsers(users.items);
+      setTotalPages(users.totalPages);
+      setTotalUsers(users.totalItems);
     } catch (error) {
       console.error("Error fetching users:", error);
     }
@@ -50,24 +57,51 @@ export default function UsersPage() {
 
   const handleSave = async (user: any) => {
     console.log("user : ", user);
-    const method = user.id ? "PUT" : "POST";
-    const res = await fetch("/api/users", {
-      method,
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(user),
-    });
-    console.log(res.ok)
-    if (res.status == 500) {
-      const response = await res.json();
-      toast({ title: "บันทึกข้อมูลล้มเหลว", description: response.error, variant: "destructive", duration: 2000 });
+    // const method = user.id ? "PUT" : "POST";
+    // const res = await fetch("/api/users", {
+    //   method,
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     Authorization: `Bearer ${accesstoken}`,
+    //   },
+    //   body: JSON.stringify(user),
+    // });
+    let result: any = null;
+    console.log("user id=", user.id);
+    setEditingUser(user);
+    try {
+      if (!user.id) {
+        console.log("insert")
+        //setEditingUser(null);
+        result = await insertUser(user);
+      } else {
+        console.log("update")
+        result = await updateUser(user);
+      }
+      console.log("result", result)
+      if (result.affectedRows == 1) {
+        fetchUsers();
+        setIsDrawerOpen(false);
+        //setEditingUser(null);
+        toast({ title: "บันทึกข้อมูลสำเร็จ!", description: "ข้อมูลผู้ใช้ถูกอัปเดตเรียบร้อยแล้ว", duration: 2000 });
+      } else {
+        toast({ title: "บันทึกข้อมูลล้มเหลว", description: result.message, variant: "destructive", duration: 2000 });
+      }
+    } catch (error) {
+      console.log("error", error);
+      toast({ title: "บันทึกข้อมูลล้มเหลว", description:"เกิดข้อผิดพลาด", variant: "destructive", duration: 2000 });
     }
-    if (res.ok) {
-      console.log("res.ok=", res.ok);
-      fetchUsers();
-      setIsDrawerOpen(false);
-      setEditingUser(null);
-      toast({ title: "บันทึกข้อมูลสำเร็จ!", description: "ข้อมูลผู้ใช้ถูกอัปเดตเรียบร้อยแล้ว", duration: 2000 });
-    }
+    // if (res.status == 500) {
+    //   const response = await res.json();
+    //   toast({ title: "บันทึกข้อมูลล้มเหลว", description: response.error, variant: "destructive", duration: 2000 });
+    // }
+    // if (res.ok) {
+    //   console.log("res.ok=", res.ok);
+    //   fetchUsers();
+    //   setIsDrawerOpen(false);
+    //   setEditingUser(null);
+    //   toast({ title: "บันทึกข้อมูลสำเร็จ!", description: "ข้อมูลผู้ใช้ถูกอัปเดตเรียบร้อยแล้ว", duration: 2000 });
+    // }
   };
 
   const openDeleteModal = (id: number) => {
@@ -76,13 +110,20 @@ export default function UsersPage() {
   };
 
   const handleDelete = async () => {
-    if (!selectedUserId) return;
-    const res = await fetch("/api/users", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: selectedUserId }),
-    });
-    if (res.ok) {
+    // if (!selectedUserId) return;
+    // const res = await fetch("/api/users", {
+    //   method: "DELETE",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({ id: selectedUserId }),
+    // });
+    // // const res = await deleteUser({id:selectedUserId});
+    // // console.log("res===",res);
+    // if (res?.ok) {    }
+
+    const result: any = await deleteUser(selectedUserId);
+    console.log("result=", result);
+
+    if (result.affectedRows == 1) {
       fetchUsers();
       toast({ title: "ลบผู้ใช้สำเร็จ", description: "ผู้ใช้ถูกลบออกจากระบบแล้ว" });
       setIsDeleteModalOpen(false);
@@ -100,11 +141,11 @@ export default function UsersPage() {
           <div className="flex w-full items-center gap-2">
             <div className="font-medium text-xl">
               ผู้ใช้งาน
-              </div>
-              <span className="h-fit inline-flex items-center bg-slate-100 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">
-                  {/* <span className="w-2 h-2 me-1 bg-red-500 rounded-full"></span> */}
-                  {totalUsers} รายการ
-              </span>
+            </div>
+            <span className="h-fit inline-flex items-center bg-slate-100 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">
+              {/* <span className="w-2 h-2 me-1 bg-red-500 rounded-full"></span> */}
+              {totalUsers} รายการ
+            </span>
           </div>
           <div className="flex gap-2">
             <div className="relative">

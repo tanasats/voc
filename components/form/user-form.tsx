@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@radix-ui/react-label";
+import { thaidate } from "@/lib/utils";
 
 interface UserFormProps {
   user?: any;
@@ -19,10 +20,10 @@ export default function UserForm({ user, onSave, onCancel }: UserFormProps) {
   }
   const [formData, setFormData] = useState(initForm);
   useEffect(() => {
-    console.log("user=",user)
-    if (user){
+    console.log("user=", user)
+    if (user) {
       setFormData(user);
-    }else{
+    } else {
       setFormData(initForm)
     }
   }, [user]);
@@ -33,6 +34,7 @@ export default function UserForm({ user, onSave, onCancel }: UserFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    //setFormData(initForm);
     onSave(formData);
   };
 
@@ -61,6 +63,9 @@ export default function UserForm({ user, onSave, onCancel }: UserFormProps) {
           <Button type="submit">บันทึก</Button>
         </div>
       </form>
+      <div className="text-sm italic font-thin">
+        {user ? `วันที่ปรับปรุง : ${thaidate(user.modified_at)}` : ""}
+      </div>
     </div>
   );
 }
