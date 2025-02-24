@@ -2,6 +2,7 @@ import React from 'react'
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
+    LuEllipsisVertical,
     LuPencil,
     LuTrash2,
 } from 'react-icons/lu';
@@ -44,8 +45,9 @@ export default function UserItem(props: Props) {
                         <div className="flex-1 hidden md:block">{props.user.username}</div>
                         <div className="flex-1">{props.user.fullname}</div>
                         <div className="flex-1 hidden md:block">{props.user.email}</div>
-                        <div className="flex-1 hidden md:block">{props.user.role}</div>
+                        <div className="flex-1 hidden md:block">{props.user.role||'-'}</div>
                     </div>
+                    <div className='w-[32px] flex justify-end cursor-pointer'><LuEllipsisVertical /></div>
                 </div>
 
             </div>

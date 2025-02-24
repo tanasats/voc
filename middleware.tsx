@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-const SECRET_KEY = new TextEncoder().encode("tanasat-secret-key"); // แปลง Secret เป็น Uint8Array
+const SECRET_KEY =  new TextEncoder().encode(process.env.SECRET_KEY);
+//const SECRET_KEY = new TextEncoder().encode("tanasat-secret-key"); // แปลง Secret เป็น Uint8Array
 
 async function verifyJWT(token: string) {
   try {

@@ -15,7 +15,7 @@ import {
 } from "react-icons/lu";
 
 import Tooltip from '@/components/Tooltip';
-import { deleteUser, getUser, insertUser, updateUser } from "@/app/_actions/user-action";
+import { deleteUser, getUser, insertUser, updateUser } from "@/app/actions/user-action";
 
 export default function UsersPage() {
   const accesstoken = cookie.get('token'); //console.log("UsersPage() token=", accesstoken);

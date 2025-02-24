@@ -1,14 +1,3 @@
-// import SignInForm from '@/components/form/signin-form'
-// import React from 'react'
-
-// export default function SignIn() {
-//   return (
-//     <div className='content-wrapper'>
-//       <SignInForm />
-//     </div>
-//   )
-// }
-
 'use client'
 import { FormEvent, useState } from 'react'
 import {
@@ -24,17 +13,17 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { LoginSchema } from '@/lib/zodschema/loginschema'
-import { signinAction } from '@/app/actions/auth'
+//import { signinAction } from '@/app/actions/auth'
 import { useSession } from '@/app/context/SessionContext'
-//import toast from 'react-hot-toast'
 import { useToast } from "@/hooks/use-toast"
 import { EyeIcon, EyeOffIcon, Loader2 } from "lucide-react";
-import { addUser, findUsername } from '../_actions/user-action'
+//import { addUser, findUsername } from '../_actions/user-action'
+import { msu_auth } from '../actions/auth-action'
+import { getByUsername, insertUser } from '../actions/user-action'
+import { decodeToken, signToken } from '../actions/jwt-action'
 
 export default function Login() {
   const [formError, setFormError] = useState<any[]>([]);
-  //const [username, setUsername] = useState("");
-  //const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const { login } = useSession();
   const [isShowPassword, setIsShowPassword] = useState(false);
@@ -61,39 +50,41 @@ export default function Login() {
       setFormError(fe);
       return;
     }
-    // form is valid ----------------------------------------------------
+    // form is valid ------------------------------
     setFormError([]);
-    try {
-      const response = await fetch("https://data.msu.ac.th/api/login/", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
+
+    const data = await msu_auth(username, password);
+    console.log("msu_auth() :", data);
+
+    if (data.access_token) {
+      // เพิ่มผู้ใช้งานลงในฐานข้อมูล ถ้ามีแล้วมันก็จะไม่เข้า..555
+      const result1 = await insertUser({
+        username: data.username, 
+        fullname: data.fullname,
+        email: data.mail,
+        usertype: data.usertype
+      })
+      console.log("result1=",result1);
+      // อ่านข้อมูลผู้ใช้งานเพื่อต้องการทราบ role ผู้ใช้งาน
+      const result2 = await getByUsername(data.username);
+      console.log("result2=",result2);
+      
+      const test = await decodeToken(data.access_token);
+      console.log("test decode token = ",test);
+
+      const testtoken = await signToken({
+        username:"tanasat",
+        roles:'xxx'
       });
-
-      const data = await response.json();
-      console.log("data=", data);
-
-      if (data.status === 'error') {
-        // toast.error(data.message);
-        toast({
-          variant: "destructive",
-          title: "ผิดพลาด",
-          description: data.message,
-        })
-        throw new Error(data.message || "Login failed");
-      }
-
-      // ตรวจสอบ username ในฐายข้อมูล
-      // ถ้าไม่พบ ให้ทำการ Insert ลงในฐานข้อมูล role=<usertype>
-      //const res =  findUsername(data.username)
-      //console.log("result=",res);
-      const res1 = await addUser(data.username, data.fullname, data.mail,  data.usertype );
-      console.log("res1: ",res1)
+      console.log("testToken=",testtoken);
       // ใช้ login function จาก SessionContext เพื่อ set ค่า session
       login({ id: data.username, name: data.fullname, role: data.usertype, email: data.mail }, data.access_token);
-
-    } catch (error: any) {
-      setError(error.message);
+    } else {
+      toast({
+        variant: "destructive",
+        title: "ผิดพลาด",
+        description: data.message,
+      })
     }
   };
 
@@ -102,7 +93,7 @@ export default function Login() {
       <form onSubmit={handleSubmit}>
         <Card className='mt-8'>
           <CardHeader>
-            <CardTitle>เข้าใช้งาน</CardTitle>
+            <CardTitle className='text-2xl'>เข้าใช้งาน</CardTitle>
             <CardDescription>
               เข้าใช้งานด้วย MSU Authentication
             </CardDescription>
@@ -114,7 +105,7 @@ export default function Login() {
                 id="username"
                 name="username"
                 type="text"
-                placeholder="username or email"
+                placeholder="username"
               />
               <span className='text-xs text-red-500 italic'>{formError.find((e) => e.for == "username")?.message}</span>
             </div>
@@ -148,6 +139,10 @@ export default function Login() {
           <Link className="underline ml-2" href="#">
             Sign Up
           </Link>
+        </div>
+        <div className='text-center'>
+          <Link href={"/"}>
+          หน้าหลัก</Link>
         </div>
       </form>
     </div>

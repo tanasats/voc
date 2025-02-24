@@ -15,11 +15,11 @@ type NavItem = {
 }
 
 const navItems: NavItem[] = [
-    {
-        label: "แผงควบคุม",
-        link: "/dashboard",
-        iconImage: ""
-    },
+    // {
+    //     label: "แผงควบคุม",
+    //     link: "/dashboard",
+    //     iconImage: ""
+    // },
     // {
     //     label: "about",
     //     link: "/about",
@@ -30,21 +30,21 @@ const navItems: NavItem[] = [
     //     link: "/test",
     //     iconImage: ""
     // },
-    {
-        label: "Profile",
-        link: "/profile",
-        iconImage: ""
-    },    
-    {
-        label: "users",
-        link: "/admin/users",
-        iconImage: ""
-    },
-    {
-        label: "survey",
-        link: "/survey",
-        iconImage: ""
-    },
+    // {
+    //     label: "Profile",
+    //     link: "/profile",
+    //     iconImage: ""
+    // },    
+    // {
+    //     label: "users",
+    //     link: "/admin/users",
+    //     iconImage: ""
+    // },
+    // {
+    //     label: "Survey",
+    //     link: "/survey",
+    //     iconImage: ""
+    // },
 ];
 
 export default function Navbar() {
@@ -68,7 +68,7 @@ export default function Navbar() {
                     </span>
                 </Link>
                 <div className="hidden sm:block">
-                    <ul className="flex gap-4">
+                    <ul className="flex gap-4 items-center">
                         {navItems.map((item, index) => (
                             <li key={index} >
                                 <Link href={item.link}>
@@ -77,9 +77,9 @@ export default function Navbar() {
                             </li>
                         ))}
                         {user ?
-                            <li><div className='cursor-pointer'  onClick={() => setIsModalOpen(true)}>SignOut</div></li>
+                            <li><div className='cursor-pointer' onClick={() => setIsModalOpen(true)}><LuLogOut/></div></li>
                             :
-                            <li><Link href={"/signin"}>SignIn</Link></li>
+                            <li><div className=''><Link href={"/signin"}><LuLogIn/></Link></div></li>
                         }
                     </ul>
                 </div>
@@ -104,7 +104,7 @@ export default function Navbar() {
 function MobileNav({ closeSideMenu }: { closeSideMenu: () => void }) {
     const { user, logout } = useSession();
     return (
-        <div className="fixed left-0 top-0 flex h-full min-h-screen w-full justify-end bg-black/60 md:hidden">
+        <div className="z-50 fixed left-0 top-0 flex h-full min-h-screen w-full justify-end bg-black/60 md:hidden">
             <div className="h-full w-[65%] bg-white px-4 py-4">
                 <section className='flex justify-end mb-4'>
                     <FiX
@@ -122,9 +122,9 @@ function MobileNav({ closeSideMenu }: { closeSideMenu: () => void }) {
                             </li>
                         ))}
                         {user ?
-                            <li className='p-2 w-full hover:bg-slate-300'><div className='text-center cursor-pointer' onClick={() => logout()}><LuLogOut/></div></li>
+                            <li className='p-2 w-full hover:bg-slate-300'><div className='items-center text-center cursor-pointer' onClick={() => logout()}><LuLogOut/></div></li>
                             :
-                            <li className='p-2 w-full hover:bg-slate-300'><Link className='text-center block' href={"/signin"}><LuLogIn/></Link></li>
+                            <li className='p-2 w-full hover:bg-slate-300'><Link className='items-center text-center block' href={"/signin"}><LuLogIn/></Link></li>
                         }
                     </ul>
                 </div>
